@@ -1,1 +1,28 @@
-<h1>Login</h1>
+<div class="auth-container">
+  <h2>Login</h2>
+  <form action="/login" method="POST">
+    <div class="form-control">
+      <label for="email">E-mail</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        value="{{email}}"
+        placeholder="E-mail"
+        required
+      />
+    </div>
+    <div class="form-control">
+      <label for="password">Senha</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="Senha"
+        required
+      />
+    </div>
+    <input class="btn" type="submit" value="Entrar" />
+    <p>Não tem uma conta? <a href="/register">clique aqui</a></p>
+  </form>
+</div>

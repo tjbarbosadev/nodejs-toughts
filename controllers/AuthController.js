@@ -9,8 +9,29 @@ module.exports = class AuthController {
     res.render('auth/register');
   }
 
-  static loginPost(req, res) {
-    res.render('auth/login');
+  static async loginPost(req, res) {
+    const { email, password } = req.body;
+
+    // check user exists
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      req.flash('msg', 'Usuário não cadastrado');
+      return res.render('auth/login');
+    }
+
+    // check password
+    const passMatch = bcrypt.compareSync(password, user.password);
+    if (!passMatch) {
+      req.flash('msg', 'Senha incorreta');
+      return res.render('auth/login', { email });
+    }
+
+    // initialize session
+    req.session.userid = user.id;
+    req.flash('msg', 'Login efetuado com sucesso');
+    req.session.save(() => {
+      res.redirect('/');
+    });
   }
 
   static async registerPost(req, res) {
