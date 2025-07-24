@@ -5,5 +5,7 @@ const checkAuth = require('../helpers/auth').checkAuth;
 
 router.get('/', ToughtsController.showToughts);
 router.get('/dashboard', checkAuth, ToughtsController.showDashboard);
+router.get('/add', checkAuth, ToughtsController.addTought);
+router.post('/add', checkAuth, ToughtsController.addToughtSave);
 
 module.exports.toughtsRoutes = router;
