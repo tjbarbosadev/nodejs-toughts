@@ -12,6 +12,7 @@ module.exports = class AuthController {
   static loginPost(req, res) {
     res.render('auth/login');
   }
+
   static async registerPost(req, res) {
     const { name, email, password, cpassword } = req.body;
 
@@ -54,5 +55,10 @@ module.exports = class AuthController {
     } catch (err) {
       console.log(`Falha no cadastro ${err}`);
     }
+  }
+
+  static logout(req, res) {
+    req.session.destroy();
+    res.redirect('/login');
   }
 };

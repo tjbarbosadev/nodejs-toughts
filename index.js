@@ -65,8 +65,8 @@ app.get('/', ToughtController.showToughts);
 
 // Start server
 conn
-  // .sync()
-  .sync({ force: true })
+  .sync()
+  // .sync({ force: true })
   .then(() => {
     app.listen(3000, () => {
       console.log('Server running on port 3000');
