@@ -1,78 +1,74 @@
 // Import required modules
-const express = require('express'); // Express framework
-const exphbs = require('express-handlebars'); // Handlebars template engine
-const session = require('express-session'); // Session middleware
-const FileStore = require('session-file-store')(session); // File-based session store
-const flash = require('express-flash'); // Flash messages for one-time notifications
+const express = require('express');
+const exphbs = require('express-handlebars');
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+const flash = require('express-flash');
 
-// Initialize Express application
+// Initialize Express
 const app = express();
-// Database connection
 const conn = require('./db/conn');
 
 // Models
 const Tought = require('./models/Tought');
 const User = require('./models/User');
 
-// Configure Handlebars as the view engine
-app.engine('handlebars', exphbs.engine()); // Set up Handlebars engine
-app.set('view engine', 'handlebars'); // Set Handlebars as the default view engine
+// Routes
+const { toughtsRoutes } = require('./routes/toughtsRoutes');
 
-// Middleware to parse URL-encoded form data
-app.use(
-  express.urlencoded({
-    extended: true, // Allows parsing of nested objects
-  })
-);
+// Controllers
+const ToughtController = require('./controllers/ToughtsController');
 
-// Middleware to parse JSON data
-app.use(express.json()); // Note: Fixed missing parentheses here
+// Handlebars config
+app.engine('handlebars', exphbs.engine());
+app.set('view engine', 'handlebars');
 
-// Configure session middleware
+// Middlewares
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Session config
 app.use(
   session({
-    name: 'session', // Name of the session ID cookie
-    secret: 'nosso_secret', // Secret used to sign the session ID cookie
-    resave: false, // Don't save session if unmodified
-    saveUninitialized: false, // Don't create session until something is stored
+    name: 'session',
+    secret: 'nosso_secret',
+    resave: false,
+    saveUninitialized: false,
     store: new FileStore({
-      // File-based session store configuration
-      logFn: function () {}, // Disable logging
-      path: require('path').join(require('os').tmpdir(), 'sessions'), // Store sessions in OS temp directory
+      logFn: function () {},
+      path: require('path').join(require('os').tmpdir(), 'sessions'),
     }),
     cookie: {
-      // Cookie settings
-      secure: false, // Set to true if using HTTPS
-      maxAge: 360000, // Session duration in milliseconds (6 minutes)
-      expires: new Date(Date.now() + 360000), // Expiration date
-      httpOnly: true, // Prevent client-side JS from accessing the cookie
+      secure: false,
+      maxAge: 360000,
+      httpOnly: true,
     },
   })
 );
 
-// Flash messages middleware (must be after session middleware)
 app.use(flash());
-
-// Serve static files from 'public' directory
 app.use(express.static('public'));
 
-// Custom middleware to make session data available in views
+// Set session to res.locals
 app.use((req, res, next) => {
   if (req.session.userid) {
-    // If user is logged in (has userid in session)
-    res.locals.session = req.session; // Make session data available in all views
+    res.locals.session = req.session;
   }
-  next(); // Continue to next middleware/route
+  next();
 });
 
-// Database synchronization and server startup
+// Routes
+app.use('/toughts', toughtsRoutes);
+app.get('/', ToughtController.showToughts); // Fixed: using get() instead of use()
+
+// Start server
 conn
-  // .sync({ force: true }) // Uncomment to force database recreation (drops existing tables)
-  .sync() // Normal synchronization (creates tables if they don't exist)
+  .sync()
   .then(() => {
-    // Start the server after successful database sync
     app.listen(3000, () => {
-      console.log('Connected on port 3000'); // Fixed typo in message
+      console.log('Server running on port 3000');
     });
   })
-  .catch(console.log); // Log any errors that occur during sync
+  .catch((err) => {
+    console.log('Connection error:', err);
+  });
