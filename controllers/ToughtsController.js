@@ -56,4 +56,28 @@ module.exports = class ToughtsController {
       console.log('Erro ao remover', error);
     }
   }
+
+  static async editTought(req, res) {
+    const { id } = req.params;
+
+    const tought = await Tought.findOne({ where: { id }, raw: true });
+
+    res.render('toughts/edit', { tought });
+  }
+
+  static async editToughtSave(req, res) {
+    const { id, title } = req.body;
+
+    try {
+      await Tought.update({ title }, { where: { id } });
+
+      req.flash('msg', 'Pensamento atualizado');
+
+      req.session.save(() => {
+        return res.redirect('/toughts/dashboard');
+      });
+    } catch (err) {
+      console.log('Erro ao atualizar pensamento', err);
+    }
+  }
 };
