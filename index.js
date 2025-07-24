@@ -15,6 +15,7 @@ const User = require('./models/User');
 
 // Routes
 const { toughtsRoutes } = require('./routes/toughtsRoutes');
+const { authRoutes } = require('./routes/authRoutes');
 
 // Controllers
 const ToughtController = require('./controllers/ToughtsController');
@@ -59,7 +60,8 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/toughts', toughtsRoutes);
-app.get('/', ToughtController.showToughts); // Fixed: using get() instead of use()
+app.use('/', authRoutes);
+app.get('/', ToughtController.showToughts);
 
 // Start server
 conn
