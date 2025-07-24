@@ -10,6 +10,10 @@ const app = express();
 // Database connection
 const conn = require('./db/conn');
 
+// Models
+const Tought = require('./models/Tought');
+const User = require('./models/User');
+
 // Configure Handlebars as the view engine
 app.engine('handlebars', exphbs.engine()); // Set up Handlebars engine
 app.set('view engine', 'handlebars'); // Set Handlebars as the default view engine
